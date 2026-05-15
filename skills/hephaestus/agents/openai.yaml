@@ -1,4 +1,4 @@
 interface:
  display_name: "Hephaestus - Deep Agent"
- short_description: "Deep implementation agent for one clear goal, with real internal agents when useful."
- default_prompt: "Use Hephaestus to implement this goal end to end with verification."
+ short_description: "Deep implementation lead for one clear goal, using required named agents."
+ default_prompt: "Use Hephaestus to lead this implementation by routing specialist work to the required named agents and verifying the result."

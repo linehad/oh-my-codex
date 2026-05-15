@@ -11,7 +11,8 @@ Invoking any user-facing Oh My Codex skill for a non-trivial task counts as an
 explicit request for that skill's agent behavior, including its required
 internal agents. For example, `$sisyphus로 HTML 테트리스 만들어줘` lets Sisyphus
 delegate implementation to Sisyphus Junior, then call Multimodal Looker or
-Momus when needed, without requiring the user to add "서브 에이전트 만들어서".
+Momus according to the routing rules, without requiring the user to add
+"에이전트 만들어서".
 
 ## User-Facing Skills
 
@@ -43,6 +44,21 @@ execution, they delegate implementation by category to Sisyphus Junior.
 Hephaestus is reserved for explicit deep-agent use or architecture-heavy
 implementation.
 
+Primary skills coordinate; they do not absorb specialist work into local
+self-analysis when agent tools are available:
+
+- Sisyphus routes end-to-end work to Sisyphus Junior, Oracle, Librarian,
+  Explore, Multimodal Looker, Metis, and Momus as needed.
+- Prometheus plans by using Explore/Librarian for evidence, Metis for gaps,
+  Oracle for architecture or implementation strategy, then Momus for review.
+- Atlas executes accepted plans by delegating code-writing, bug fixing, tests,
+  and commits to Sisyphus Junior or named specialists, then verifies.
+- Hephaestus may lead deep implementation, but for non-trivial work it should
+  still use Explore for code mapping, Oracle for high-risk decisions, bounded
+  Sisyphus Junior tasks for edits, and Momus before the final answer.
+- Browser-visible UI, game, canvas, screenshot, PDF, or diagram work should run
+  Multimodal Looker before Momus so final review sees visual/runtime evidence.
+
 ## Internal Agents
 
 These are not installed as separate user-facing skills. The four user-facing
@@ -50,7 +66,7 @@ skills invoke them as real Codex agents with injected role-specific prompts.
 
 | Agent | Purpose | Default reasoning |
 | --- | --- | --- |
-| Oracle | Read-only architecture, debugging, and review consultant | high |
+| Oracle | Read-only architecture, debugging, risk, and tradeoff advisor | high |
 | Librarian | Docs, API, library, and external research | medium |
 | Explore | Fast local codebase exploration | low |
 | Multimodal Looker | Screenshots, PDFs, diagrams, and visual QA | medium |
@@ -66,6 +82,21 @@ findings/results to the parent.
 Progress and final reports should name the assigned agent only, such as
 `Sisyphus Junior`, `Momus`, `Oracle`, or `Multimodal Looker`.
 
+Internal agent definitions are templates, not singletons. A primary skill must
+assume every internal agent can be spawned multiple times, including Sisyphus
+Junior, Oracle, Explore, Librarian, Multimodal Looker, Metis, and Momus. Use
+multiple instances whenever the work naturally splits into independent bounded
+scopes; the user does not need to explicitly request parallel agents. Keep the
+assigned name the same and put the difference in a `Scope:` line, for example
+two `Oracle` instances for security and performance, multiple `Explore`
+instances for separate directories, or multiple `Sisyphus Junior` instances for
+disjoint implementation slices. Do not invent decorated user-facing variants of
+the assigned agent names.
+
+Multiple instances are normal internal task calls, not Team Mode membership.
+Do not put Oracle, Librarian, Explore, Multimodal Looker, Metis, Momus, or
+Prometheus into Team Mode slots; invoke them through internal routing.
+
 Every injected agent prompt should include the assigned agent name:
 
 ```text
@@ -75,19 +106,46 @@ Return findings only to the parent.
 
 Agent: Momus
 Role: independent reviewer for plans, completed work, verification evidence, blockers, and residual risk.
+Scope: final review of the completed implementation
 ```
 
 Routing follows the upstream orchestration guide: primary agents are selected
 directly, while internal agents are invoked through typed task routing or
-category dispatch. Categories such as `visual-engineering`, `quick`, or `deep`
-go to Sisyphus Junior. Non-trivial flows also run Momus review before the final
-answer.
+category dispatch. Category dispatch always goes to Sisyphus Junior.
+Official built-in categories include `visual-engineering`, `artistry`,
+`ultrabrain`, `deep`, `quick`, `unspecified-low`, `unspecified-high`,
+`writing`, `quick-rust`, `quick-zig`, and `git`. Use `visual-engineering` for
+frontend, UI, game, canvas, HTML/CSS, and browser-visible work. Do not invent
+categories such as `frontend`. Non-trivial flows also run Momus review before
+the final answer.
 
 Prometheus does not solo-plan non-trivial work when agent tools are available.
 For technical app/game/UI planning, it should use Explore for existing files,
 Oracle for architecture or implementation strategy, and Momus before presenting
 the final plan. Metis and Librarian are added when ambiguity or external docs
 matter.
+
+Oracle is not the file-search agent. Explore owns file discovery, codebase grep,
+symbol mapping, and local pattern collection. Oracle receives the user's goal
+and the relevant context, then advises on architecture, debugging hypotheses,
+security, performance, and tradeoffs. If Oracle needs a code map, the parent
+skill should spawn Explore and pass the findings to Oracle.
+
+In large projects, split Oracle by decision domain rather than file search:
+architecture boundaries, security, performance, data migration, deployment, or
+debugging hypotheses. The parent skill synthesizes conflicting Oracle findings
+and may ask another scoped Oracle pass only for conflict resolution.
+
+Split Sisyphus Junior by ownership scope: one instance per independent
+implementation slice, file group, package, or checklist item. Multiple Sisyphus
+Junior instances must have disjoint write scopes, must be told they are not
+alone in the codebase, and must report changed files and verification evidence
+back to the parent.
+
+Sisyphus Junior cannot call other agents. It must keep its own task tracking,
+complete every assigned item before returning, verify with the strongest local
+diagnostics available, and avoid modifying `.sisyphus/` plan files unless that
+is the explicit owned deliverable.
 
 ## Install
 
