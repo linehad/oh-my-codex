@@ -1,0 +1,4 @@
+interface:
+  display_name: "Atlas - Plan Executor"
+  short_description: "Executes accepted plans with tracked verification and real private subagents."
+  default_prompt: "Use Atlas to execute this approved plan with verification."
