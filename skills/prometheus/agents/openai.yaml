@@ -1,4 +1,4 @@
 interface:
  display_name: "Prometheus - Plan Builder"
  short_description: "Plan-only builder with assumptions, gates, research, and verification."
- default_prompt: "Use Prometheus to write a plan before implementation with real research and review agents."
+ default_prompt: "Use Prometheus in plan-only mode: ask for Plan Mode when needed, use required named agents for non-trivial planning, review with Momus, and wait for approval before implementation."

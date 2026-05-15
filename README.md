@@ -8,8 +8,8 @@ OpenAgent agents are internal agents invoked by those four skills; they are not
 installed as user-facing skills and should not be invoked directly by users.
 
 Invoking any user-facing Oh My Codex skill for a non-trivial task counts as an
-explicit request for that skill's agent behavior, including internal agents
-when useful. For example, `$sisyphus로 HTML 테트리스 만들어줘` lets Sisyphus
+explicit request for that skill's agent behavior, including its required
+internal agents. For example, `$sisyphus로 HTML 테트리스 만들어줘` lets Sisyphus
 delegate implementation to Sisyphus Junior, then call Multimodal Looker or
 Momus when needed, without requiring the user to add "서브 에이전트 만들어서".
 
@@ -83,6 +83,12 @@ category dispatch. Categories such as `visual-engineering`, `quick`, or `deep`
 go to Sisyphus Junior. Non-trivial flows also run Momus review before the final
 answer.
 
+Prometheus does not solo-plan non-trivial work when agent tools are available.
+For technical app/game/UI planning, it should use Explore for existing files,
+Oracle for architecture or implementation strategy, and Momus before presenting
+the final plan. Metis and Librarian are added when ambiguity or external docs
+matter.
+
 ## Install
 
 PowerShell:
@@ -116,8 +122,10 @@ Planner-only flow:
 $prometheus 로 플랜모드처럼 계획부터 작성해줘
 ```
 
-The planner should clarify scope, write a plan, define verification, and wait
-for approval before execution.
+Prometheus cannot toggle Codex Plan Mode automatically. If Plan Mode is not
+already active, it should ask the user to turn on Plan Mode and stop. If the
+user explicitly chooses not to switch, Prometheus may continue with a fallback
+plan-only lock.
 
 ## License And Attribution
 
