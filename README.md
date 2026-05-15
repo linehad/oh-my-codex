@@ -66,6 +66,17 @@ uses one, it must spawn a separate subagent when subagent tools are available.
 The prompt should clearly say it is a private subagent for the parent task and
 must return findings/results to the parent.
 
+Every private subagent prompt should include an explicit injected identity:
+
+```text
+You are a private internal subagent for this parent task.
+Do not call or create Sisyphus, Hephaestus, Prometheus, Atlas, or any other agent.
+Return findings only to the parent.
+
+Private internal subagent: Momus
+Role: independent reviewer for plans, completed work, verification evidence, blockers, and residual risk.
+```
+
 Routing follows the upstream orchestration guide: primary agents are selected
 directly, while subagents are invoked privately through `task(subagent_type=...)`
 or category dispatch. Category dispatch such as `visual-engineering`, `quick`,

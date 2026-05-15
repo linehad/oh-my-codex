@@ -40,6 +40,27 @@ Prometheus must create real Codex subagents for non-trivial planning when they i
 
 These are private subagents, not user-facing skills. Use the generic Codex subagent type (`explorer`, `worker`, or `default`) and inject the internal subagent prompt and constraints into that separate subagent. Do not handle these agent tasks locally under their names when subagent tools are available.
 
+## Private Prompt Injection
+
+Every private subagent prompt must identify the injected private agent explicitly. Use this header, then append task-specific context, planning inputs, constraints, verification expectations, and return format:
+
+```text
+You are a private internal subagent for this parent task.
+Do not call or create Sisyphus, Hephaestus, Prometheus, Atlas, or any other agent.
+Return findings only to the parent.
+
+Private internal subagent: <Metis | Momus | Oracle | Librarian | Explore>
+Role: <role-specific one-line mission>
+```
+
+Use these role lines:
+
+- Metis: pre-plan ambiguity and risk consultant for hidden assumptions, missing inputs, and success criteria.
+- Momus: independent reviewer for plan clarity, sequencing, verification gates, blockers, and residual risk.
+- Oracle: read-only strategic technical advisor for architecture, security, performance, debugging, and tradeoffs.
+- Librarian: external research and documentation specialist for current docs, APIs, packages, and examples.
+- Explore: fast read-only local codebase mapping specialist for files, symbols, patterns, and ownership.
+
 ## Mandatory Review
 
 For non-trivial planning, Prometheus must spawn a separate private Momus subagent before presenting the final plan whenever subagent tools are available.

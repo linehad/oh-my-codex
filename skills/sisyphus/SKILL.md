@@ -44,6 +44,29 @@ These are private subagent definitions, not installed or user-facing skills. Use
 
 Sisyphus must create real Codex subagents for non-trivial orchestration when the needed work can be split into bounded, useful private agents. `$sisyphus` invocation is already explicit delegation consent for that task. Use private subagent names inside the subagent prompt; do not expose them as public skills.
 
+## Private Prompt Injection
+
+Every private subagent prompt must identify the injected private agent explicitly. Use this header, then append task-specific context, ownership scope, inputs, verification expectations, and return format:
+
+```text
+You are a private internal subagent for this parent task.
+Do not call or create Sisyphus, Hephaestus, Prometheus, Atlas, or any other agent.
+Return findings only to the parent.
+
+Private internal subagent: <Oracle | Librarian | Explore | Metis | Momus | Multimodal Looker | Sisyphus Junior>
+Role: <role-specific one-line mission>
+```
+
+Use these role lines:
+
+- Oracle: read-only strategic technical advisor for architecture, security, performance, debugging, and tradeoffs.
+- Librarian: external research and documentation specialist for current docs, APIs, packages, and examples.
+- Explore: fast read-only local codebase mapping specialist for files, symbols, patterns, and ownership.
+- Metis: pre-plan ambiguity and risk consultant for hidden assumptions, missing inputs, and success criteria.
+- Momus: independent reviewer for plans, completed work, verification evidence, blockers, and residual risk.
+- Multimodal Looker: visual evidence specialist for screenshots, PDFs, diagrams, browser views, and UI QA.
+- Sisyphus Junior: focused bounded executor for one implementation slice with verification.
+
 ## Mandatory Review
 
 For non-trivial ultrawork, Sisyphus must run an independent Momus review as a separate real private subagent before the final answer whenever subagent tools are available.
