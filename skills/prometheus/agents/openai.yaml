@@ -1,4 +1,4 @@
 interface:
-  display_name: "Prometheus - Plan Builder"
-  short_description: "Plan-only builder with assumptions, gates, research, and verification."
-  default_prompt: "Use Prometheus to write a plan before implementation with real private research and review subagents."
+ display_name: "Prometheus - Plan Builder"
+ short_description: "Plan-only builder with assumptions, gates, research, and verification."
+ default_prompt: "Use Prometheus to write a plan before implementation with real research and review agents."

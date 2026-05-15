@@ -3,16 +3,15 @@
 Codex skill pack for agent-harness style orchestration, aligned with the
 oh-my-openagent / oh-my-opencode project family.
 
-The package installs four public Oh My Codex skills. Other Oh My OpenAgent
-agents are private internal subagents invoked by those four skills; they are not
+The package installs four user-facing Oh My Codex skills. Other Oh My
+OpenAgent agents are internal agents invoked by those four skills; they are not
 installed as user-facing skills and should not be invoked directly by users.
 
-Invoking any public Oh My Codex skill for a non-trivial task is intended to
-count as an explicit request for that skill's agent behavior, including private
-internal subagents when useful. For example, `$sisyphus로 HTML 테트리스 만들어줘`
-should let Sisyphus use category-based delegation to a private Sisyphus Junior
-worker, and real private subagents such as Explore, Multimodal Looker, or Momus
-when needed, without requiring the user to add "서브 에이전트 만들어서".
+Invoking any user-facing Oh My Codex skill for a non-trivial task counts as an
+explicit request for that skill's agent behavior, including internal agents
+when useful. For example, `$sisyphus로 HTML 테트리스 만들어줘` lets Sisyphus
+delegate implementation to Sisyphus Junior, then call Multimodal Looker or
+Momus when needed, without requiring the user to add "서브 에이전트 만들어서".
 
 ## User-Facing Skills
 
@@ -40,18 +39,16 @@ Role boundary:
 - Hephaestus is a primary deep agent for explicit deep implementation or hard debugging.
 
 Sisyphus and Atlas do not directly write code. For normal ultrawork or plan
-execution, they delegate implementation by category to private Sisyphus
-Junior-style workers. Hephaestus is reserved for explicit deep-agent use or
-architecture-heavy implementation.
+execution, they delegate implementation by category to Sisyphus Junior.
+Hephaestus is reserved for explicit deep-agent use or architecture-heavy
+implementation.
 
-## Private Internal Subagents
+## Internal Agents
 
-These are not installed as separate user-facing skills. They are private
-subagent profiles that the four public skills invoke as real Codex subagents
-with an injected role-specific prompt. They are private because users do not
-select them directly.
+These are not installed as separate user-facing skills. The four user-facing
+skills invoke them as real Codex agents with injected role-specific prompts.
 
-| Internal role | Purpose | Default reasoning |
+| Agent | Purpose | Default reasoning |
 | --- | --- | --- |
 | Oracle | Read-only architecture, debugging, and review consultant | high |
 | Librarian | Docs, API, library, and external research | medium |
@@ -61,27 +58,29 @@ select them directly.
 | Momus | Practical plan review | xhigh |
 | Sisyphus Junior | Focused one-objective executor | medium |
 
-Internal subagents must never be listed as user-facing skills. If a public skill
-uses one, it must spawn a separate subagent when subagent tools are available.
-The prompt should clearly say it is a private subagent for the parent task and
-must return findings/results to the parent.
+Non-user-facing agents must never be listed as user-facing skills. If a
+user-facing skill uses one, it must spawn a separate agent when agent tools are
+available. The prompt should include the assigned agent name and must return
+findings/results to the parent.
 
-Every private subagent prompt should include an explicit injected identity:
+Progress and final reports should name the assigned agent only, such as
+`Sisyphus Junior`, `Momus`, `Oracle`, or `Multimodal Looker`.
+
+Every injected agent prompt should include the assigned agent name:
 
 ```text
-You are a private internal subagent for this parent task.
-Do not call or create Sisyphus, Hephaestus, Prometheus, Atlas, or any other agent.
+You are working for this parent task.
+Do not call any other agent.
 Return findings only to the parent.
 
-Private internal subagent: Momus
+Agent: Momus
 Role: independent reviewer for plans, completed work, verification evidence, blockers, and residual risk.
 ```
 
 Routing follows the upstream orchestration guide: primary agents are selected
-directly, while subagents are invoked privately through `task(subagent_type=...)`
-or category dispatch. Category dispatch such as `visual-engineering`, `quick`,
-or `deep` goes to a real private Sisyphus Junior-style worker. Non-trivial
-flows also run a separate Momus-style private review subagent before the final
+directly, while internal agents are invoked through typed task routing or
+category dispatch. Categories such as `visual-engineering`, `quick`, or `deep`
+go to Sisyphus Junior. Non-trivial flows also run Momus review before the final
 answer.
 
 ## Install
@@ -130,6 +129,6 @@ This project includes:
 
 - [LICENSE.md](LICENSE.md) with SUL-1.0 terms.
 - [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) with upstream attribution
-  and modified-copy notice.
+ and modified-copy notice.
 
 Keep those files with redistributed copies.

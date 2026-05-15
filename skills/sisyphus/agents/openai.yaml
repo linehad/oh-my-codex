@@ -1,4 +1,4 @@
 interface:
-  display_name: "Sisyphus - Ultraworker"
-  short_description: "Main orchestrator for planning, execution, verification, and private subagents."
-  default_prompt: "Use Sisyphus to orchestrate this task end to end with real private subagents."
+ display_name: "Sisyphus - Ultraworker"
+ short_description: "Main orchestrator for planning, execution, verification, and internal agents."
+ default_prompt: "Use Sisyphus to orchestrate this task end to end with real internal agents."
