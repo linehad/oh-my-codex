@@ -1,29 +1,20 @@
 # Oh My Codex
 
-Codex skill pack for agent-harness style orchestration, aligned with the
-oh-my-openagent / oh-my-opencode project family.
+Oh My Codex는 Codex에서 agent-harness 스타일의 작업 오케스트레이션을 사용할 수 있게 해주는 스킬 팩입니다.
+`oh-my-openagent` / `oh-my-opencode` 계열의 역할 구분을 Codex 스킬 구조에 맞춰 옮겼습니다.
 
-The package installs four user-facing Oh My Codex skills. Other Oh My
-OpenAgent agents are internal agents invoked by those four skills; they are not
-installed as user-facing skills and should not be invoked directly by users.
+이 패키지는 사용자가 직접 호출하는 공개 스킬 4개를 설치합니다. 그 밖의 에이전트는 공개 스킬이 필요할 때 내부적으로 호출하는 역할 템플릿이며, 사용자가 직접 실행하는 스킬로 설치되지 않습니다.
 
-Invoking any user-facing Oh My Codex skill for a non-trivial task counts as an
-explicit request for that skill's agent behavior, including its required
-internal agents. For example, `$sisyphus로 HTML 테트리스 만들어줘` lets Sisyphus
-delegate implementation to Sisyphus Junior, then call Multimodal Looker or
-Momus according to the routing rules, without requiring the user to add
-"에이전트 만들어서".
+## 한눈에 보기
 
-## User-Facing Skills
-
-| Skill | Role | Default Codex reasoning |
+| 공개 스킬 | 역할 | 기본 reasoning |
 | --- | --- | --- |
-| `sisyphus` | Ultraworker and main orchestrator | high |
-| `hephaestus` | Deep Agent and implementation owner | high |
-| `prometheus` | Plan Builder | high |
-| `atlas` | Plan Executor and checklist coordinator | medium |
+| `sisyphus` | 전체 작업을 조율하는 메인 오케스트레이터 | `high` |
+| `hephaestus` | 깊은 구현, 복잡한 디버깅, 아키텍처 중심 작업 담당 | `high` |
+| `prometheus` | 구현 전에 계획을 세우는 플랜 빌더 | `high` |
+| `atlas` | 승인된 계획을 체크리스트로 실행하는 플랜 실행자 | `medium` |
 
-Suggested display names:
+추천 표시 이름은 다음과 같습니다.
 
 ```text
 Sisyphus - Ultraworker
@@ -32,169 +23,119 @@ Prometheus - Plan Builder
 Atlas - Plan Executor
 ```
 
-Role boundary:
+## 언제 어떤 스킬을 쓰나요?
 
-- Sisyphus orchestrates the work and chooses the route.
-- Prometheus writes plans and does not implement.
-- Atlas executes an accepted plan as a checklist coordinator.
-- Hephaestus is a primary deep agent for explicit deep implementation or hard debugging.
+- `sisyphus`: 조사, 구현, 리뷰, 검증까지 한 번에 조율해야 하는 일반적인 큰 작업에 사용합니다.
+- `hephaestus`: 여러 파일을 건드리는 깊은 구현, 어려운 버그 추적, 아키텍처 판단이 필요한 작업에 사용합니다.
+- `prometheus`: 바로 구현하지 않고 먼저 계획, 범위, 리스크, 검증 기준을 정리해야 할 때 사용합니다.
+- `atlas`: 이미 승인된 계획이나 체크리스트를 실제 작업으로 실행할 때 사용합니다.
 
-Sisyphus and Atlas do not directly write code. For normal ultrawork or plan
-execution, they delegate implementation by category to Sisyphus Junior.
-Hephaestus is reserved for explicit deep-agent use or architecture-heavy
-implementation.
+예를 들어 `$sisyphus로 HTML 테트리스 만들어줘`처럼 공개 스킬을 명시해 비단순 작업을 요청하면, 해당 스킬의 에이전트 동작과 필요한 내부 에이전트 호출을 허용한 것으로 간주합니다. 사용자가 별도로 "에이전트 만들어서 해줘"라고 덧붙일 필요는 없습니다.
 
-Primary skills coordinate; they do not absorb specialist work into local
-self-analysis when agent tools are available:
+## 역할 경계
 
-- Sisyphus routes end-to-end work to Sisyphus Junior, Oracle, Librarian,
-  Explore, Multimodal Looker, Metis, and Momus as needed.
-- Prometheus plans by using Explore/Librarian for evidence, Metis for gaps,
-  Oracle for architecture or implementation strategy, then Momus for review.
-- Atlas executes accepted plans by delegating code-writing, bug fixing, tests,
-  and commits to Sisyphus Junior or named specialists, then verifies.
-- Hephaestus may lead deep implementation, but for non-trivial work it should
-  still use Explore for code mapping, Oracle for high-risk decisions, bounded
-  Sisyphus Junior tasks for edits, and Momus before the final answer.
-- Browser-visible UI, game, canvas, screenshot, PDF, or diagram work should run
-  Multimodal Looker before Momus so final review sees visual/runtime evidence.
+공개 스킬은 각자 맡는 일이 다릅니다.
 
-## Internal Agents
+- Sisyphus는 작업을 분류하고 전체 흐름을 조율합니다.
+- Prometheus는 계획을 작성하며, 기본적으로 구현하지 않습니다.
+- Atlas는 승인된 계획을 체크리스트로 실행하고 검증합니다.
+- Hephaestus는 명시적으로 깊은 구현이나 어려운 디버깅이 필요할 때 사용합니다.
 
-These are not installed as separate user-facing skills. The four user-facing
-skills invoke them as real Codex agents with injected role-specific prompts.
+Sisyphus와 Atlas는 직접 코드를 작성하는 역할이 아닙니다. 일반적인 구현은 내부 실행자인 Sisyphus Junior에게 위임하고, Hephaestus는 명시적인 deep-agent 작업이나 아키텍처 비중이 큰 구현에 사용합니다.
 
-| Agent | Purpose | Default reasoning |
+## 내부 에이전트
+
+아래 에이전트들은 사용자에게 노출되는 스킬이 아닙니다. 공개 스킬이 필요할 때 별도 Codex 에이전트로 호출해 사용하는 내부 역할입니다.
+
+| 내부 에이전트 | 용도 | 기본 reasoning |
 | --- | --- | --- |
-| Oracle | Read-only architecture, debugging, risk, and tradeoff advisor | high |
-| Librarian | Docs, API, library, and external research | medium |
-| Explore | Fast local codebase exploration | low |
-| Multimodal Looker | Screenshots, PDFs, diagrams, and visual QA | medium |
-| Metis | Pre-plan ambiguity and risk analysis | high |
-| Momus | Practical plan review | xhigh |
-| Sisyphus Junior | Focused one-objective executor | medium |
+| Oracle | 아키텍처, 디버깅 가설, 보안, 성능, 트레이드오프 검토 | `high` |
+| Librarian | 문서, API, 라이브러리 동작, 외부 자료 조사 | `medium` |
+| Explore | 로컬 코드베이스 검색, 파일 구조와 패턴 파악 | `low` |
+| Multimodal Looker | 스크린샷, PDF, 다이어그램, 시각적 QA 확인 | `medium` |
+| Metis | 모호한 요구사항, 숨은 가정, 누락된 성공 기준 점검 | `high` |
+| Momus | 계획, 완료된 작업, 검증 증거, 잔여 리스크 리뷰 | `xhigh` |
+| Sisyphus Junior | 한 가지 목표에 집중하는 제한 범위 실행자 | `medium` |
 
-Non-user-facing agents must never be listed as user-facing skills. If a
-user-facing skill uses one, it must spawn a separate agent when agent tools are
-available. The prompt should include the assigned agent name and must return
-findings/results to the parent.
+내부 에이전트 정의는 싱글턴이 아니라 재사용 가능한 템플릿입니다. 작업이 자연스럽게 나뉘면 같은 내부 에이전트를 여러 번 호출할 수 있습니다. 예를 들어 Oracle을 보안 검토와 성능 검토로 나누거나, Sisyphus Junior를 서로 다른 파일 그룹별 구현 작업으로 나눌 수 있습니다.
 
-Progress and final reports should name the assigned agent only, such as
-`Sisyphus Junior`, `Momus`, `Oracle`, or `Multimodal Looker`.
+## 설치
 
-Internal agent definitions are templates, not singletons. A primary skill must
-assume every internal agent can be spawned multiple times, including Sisyphus
-Junior, Oracle, Explore, Librarian, Multimodal Looker, Metis, and Momus. Use
-multiple instances whenever the work naturally splits into independent bounded
-scopes; the user does not need to explicitly request parallel agents. Keep the
-assigned name the same and put the difference in a `Scope:` line, for example
-two `Oracle` instances for security and performance, multiple `Explore`
-instances for separate directories, or multiple `Sisyphus Junior` instances for
-disjoint implementation slices. Do not invent decorated user-facing variants of
-the assigned agent names.
-
-Multiple instances are normal internal task calls, not Team Mode membership.
-Do not put Oracle, Librarian, Explore, Multimodal Looker, Metis, Momus, or
-Prometheus into Team Mode slots; invoke them through internal routing.
-
-Every injected agent prompt should include the assigned agent name:
-
-```text
-You are working for this parent task.
-Do not call any other agent.
-Return findings only to the parent.
-
-Agent: Momus
-Role: independent reviewer for plans, completed work, verification evidence, blockers, and residual risk.
-Scope: final review of the completed implementation
-```
-
-Routing follows the upstream orchestration guide: primary agents are selected
-directly, while internal agents are invoked through typed task routing or
-category dispatch. Category dispatch always goes to Sisyphus Junior.
-Official built-in categories include `visual-engineering`, `artistry`,
-`ultrabrain`, `deep`, `quick`, `unspecified-low`, `unspecified-high`,
-`writing`, `quick-rust`, `quick-zig`, and `git`. Use `visual-engineering` for
-frontend, UI, game, canvas, HTML/CSS, and browser-visible work. Do not invent
-categories such as `frontend`. Non-trivial flows also run Momus review before
-the final answer.
-
-Prometheus does not solo-plan non-trivial work when agent tools are available.
-For technical app/game/UI planning, it should use Explore for existing files,
-Oracle for architecture or implementation strategy, and Momus before presenting
-the final plan. Metis and Librarian are added when ambiguity or external docs
-matter.
-
-Oracle is not the file-search agent. Explore owns file discovery, codebase grep,
-symbol mapping, and local pattern collection. Oracle receives the user's goal
-and the relevant context, then advises on architecture, debugging hypotheses,
-security, performance, and tradeoffs. If Oracle needs a code map, the parent
-skill should spawn Explore and pass the findings to Oracle.
-
-In large projects, split Oracle by decision domain rather than file search:
-architecture boundaries, security, performance, data migration, deployment, or
-debugging hypotheses. The parent skill synthesizes conflicting Oracle findings
-and may ask another scoped Oracle pass only for conflict resolution.
-
-Split Sisyphus Junior by ownership scope: one instance per independent
-implementation slice, file group, package, or checklist item. Multiple Sisyphus
-Junior instances must have disjoint write scopes, must be told they are not
-alone in the codebase, and must report changed files and verification evidence
-back to the parent.
-
-Sisyphus Junior cannot call other agents. It must keep its own task tracking,
-complete every assigned item before returning, verify with the strongest local
-diagnostics available, and avoid modifying `.sisyphus/` plan files unless that
-is the explicit owned deliverable.
-
-## Install
-
-PowerShell:
+### PowerShell
 
 ```powershell
 .\scripts\install.ps1
 ```
 
-macOS/Linux:
+기존 스킬을 덮어쓰려면 다음처럼 실행합니다.
+
+```powershell
+.\scripts\install.ps1 -Force
+```
+
+설치 위치를 직접 지정하려면 `-Destination`을 사용합니다.
+
+```powershell
+.\scripts\install.ps1 -Destination "C:\path\to\codex\skills"
+```
+
+### macOS / Linux
 
 ```bash
 ./scripts/install.sh
 ```
 
-By default, the scripts install into `$CODEX_HOME/skills`, or
-`~/.codex/skills` when `CODEX_HOME` is not set.
+기존 스킬을 덮어쓰려면 다음처럼 실행합니다.
 
-Use `--force` to replace existing skills with the same names.
-
-Restart Codex after installing or updating skills.
-
-## Usage
-
-```text
-$sisyphus 로 이 작업을 오케스트레이션해줘
+```bash
+./scripts/install.sh --force
 ```
 
-Planner-only flow:
+설치 위치를 직접 지정하려면 `--dest`를 사용합니다.
 
-```text
-$prometheus 로 플랜모드처럼 계획부터 작성해줘
+```bash
+./scripts/install.sh --dest /path/to/codex/skills
 ```
 
-Prometheus cannot toggle Codex Plan Mode automatically. If Plan Mode is not
-already active, it should ask the user to turn on Plan Mode and stop. If the
-user explicitly chooses not to switch, Prometheus may continue with a fallback
-plan-only lock.
+기본 설치 위치는 `$CODEX_HOME/skills`입니다. `CODEX_HOME`이 설정되어 있지 않으면 `~/.codex/skills`에 설치합니다.
 
-## License And Attribution
+설치하거나 업데이트한 뒤에는 Codex를 재시작해야 새 스킬이 반영됩니다.
 
-This package is distributed under the Sustainable Use License Version 1.0
-(`SUL-1.0`) to align with the upstream oh-my-openagent / oh-my-opencode
-licensing model.
+## 사용 예시
 
-This project includes:
+전체 작업을 오케스트레이션하려면 다음처럼 요청합니다.
 
-- [LICENSE.md](LICENSE.md) with SUL-1.0 terms.
-- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) with upstream attribution
- and modified-copy notice.
+```text
+$sisyphus 로 이 작업을 끝까지 오케스트레이션해줘
+```
 
-Keep those files with redistributed copies.
+계획부터 세우고 싶다면 Prometheus를 사용합니다.
+
+```text
+$prometheus 로 구현 전에 계획부터 작성해줘
+```
+
+승인된 계획을 실행하려면 Atlas를 사용합니다.
+
+```text
+$atlas 로 이 체크리스트를 실행해줘
+```
+
+복잡한 구현이나 깊은 디버깅이 필요하다면 Hephaestus를 사용합니다.
+
+```text
+$hephaestus 로 이 버그를 깊게 분석하고 수정해줘
+```
+
+Prometheus는 Codex Plan Mode를 자동으로 켤 수 없습니다. Plan Mode가 꺼져 있으면 사용자에게 Plan Mode를 켜 달라고 요청한 뒤 멈추는 것이 기본 동작입니다. 사용자가 명시적으로 Plan Mode를 사용하지 않겠다고 하면, 대체 plan-only 흐름으로 계속할 수 있습니다.
+
+## 라이선스와 출처
+
+이 패키지는 upstream `oh-my-openagent` / `oh-my-opencode` 라이선스 모델과 맞추기 위해 Sustainable Use License Version 1.0 (`SUL-1.0`)으로 배포됩니다.
+
+관련 파일은 다음과 같습니다.
+
+- [LICENSE.md](LICENSE.md): SUL-1.0 라이선스 전문
+- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md): upstream 출처와 수정 고지
+
+재배포할 때는 위 파일들을 함께 유지해 주세요.
