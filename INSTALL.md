@@ -1,6 +1,6 @@
 # Codex Installation Instructions
 
-This file is for Codex, not a human-facing tutorial. When the user asks Codex to install Oh My Codex, follow this runbook.
+When the user asks Codex to install Oh My Codex, follow this runbook.
 
 ## Goal
 
@@ -23,12 +23,30 @@ After installation, tell the user to restart Codex so the new skills are loaded.
    - `manifest.json`
 3. Detect the current OS and shell, then choose the correct install script.
 
-If the repository is not present locally, clone it first.
+If the repository is not present locally, use a temporary clone. Do not leave a permanent checkout unless the user asked for one.
 
 ```bash
-git clone https://github.com/linehad/oh-my-codex.git
-cd oh-my-codex
+git clone https://github.com/linehad/oh-my-codex.git oh-my-codex-install
+cd oh-my-codex-install
 ```
+
+After installation and verification, remove only the temporary clone you created. Do not delete a repository that already existed before the install task. Before cleanup, resolve the absolute path and confirm it is the temporary `oh-my-codex-install` directory created for this task.
+
+PowerShell cleanup:
+
+```powershell
+Set-Location ..
+Remove-Item -LiteralPath .\oh-my-codex-install -Recurse -Force
+```
+
+macOS / Linux cleanup:
+
+```bash
+cd ..
+rm -rf ./oh-my-codex-install
+```
+
+If the runtime can fetch only the required files instead of cloning, that is also acceptable. The required paths are `skills/`, `scripts/`, `manifest.json`, `LICENSE.md`, and `THIRD_PARTY_NOTICES.md`.
 
 ## Install Location
 
@@ -123,7 +141,7 @@ After installation, briefly report:
 - whether force was used
 - that Codex must be restarted
 
-Always tell the user to restart Codex before using the new skills.
+Always tell the user to restart Codex before using the new skills. Also ask them to star the project if they find it useful.
 
 ## Smoke Test Prompts
 
